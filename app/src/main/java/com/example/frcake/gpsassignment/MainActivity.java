@@ -9,6 +9,8 @@ import android.location.LocationManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,9 +18,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     private final int permissionCode = 100;
     LocationManager locationManager;
+    LocationListener locationListener;
+    Button button;
     TextView textView, textView2;
+    private boolean clickFlag = false;
     //sets the global radius on which the program decides what activity to show
-    public static final double radius = 10000;
+    public static final double radius = 1000;
     String badPermissionToast = "For this application to work, GPS data permission is needed!";
 
     static final double athensLong = 23.7275;
@@ -35,22 +40,40 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        button = (Button) findViewById(R.id.button);
         textView = (TextView) findViewById(R.id.textView5);
         textView2 = (TextView) findViewById(R.id.textView2);
-        Toast toastBadPermission = Toast.makeText(getApplicationContext(), badPermissionToast, Toast.LENGTH_LONG);
-        //ask for permissions right after the application starts!
-        askForPermission();
+        //Toast toastBadPermission = Toast.makeText(getApplicationContext(), badPermissionToast, Toast.LENGTH_LONG);
+        //ask for permissions right after the application starts!+
 
-        //check if permission was given by the user
-        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            //Go to an activity that warns the user about
-            //this applications functionality and needed
-            //permissions in order to function correctly
-            toastBadPermission.show();
-        } else {
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
-        }
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!clickFlag) {
+                    askForPermission();
+                    //check if permission was given by the user
+                    locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+                    if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        //Go to an activity that warns the user about
+                        //this applications functionality and needed
+                        //permissions in order to function correctly
+                    } else {
+                        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, MainActivity.this);
+                    }
+                    button.setText("Stop Guide");
+                    clickFlag = true;
+                } else {
+                    try {
+                        locationManager.removeUpdates(MainActivity.this);
+                    } catch (Exception ex) {
+
+                    }
+                    button.setText("Start Guide");
+                    clickFlag = false;
+                }
+            }
+        });
     }
 
 
@@ -64,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     public void onLocationChanged(Location location) {
         double currentLat = location.getLatitude();
         double currentLong = location.getLongitude();
-       // textView.setText("Current Loc:" + String.valueOf(currentLat) + "," + String.valueOf(currentLong));
+        // textView.setText("Current Loc:" + String.valueOf(currentLat) + "," + String.valueOf(currentLong));
         float[] distance1 = new float[3];
         float[] distance2 = new float[3];
         float[] distance3 = new float[3];
@@ -76,16 +99,21 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         Location.distanceBetween(currentLat, currentLong, kritiLat, kritiLong, distance4);
         float[][] distances = {distance1, distance2, distance3, distance4};
         String closest = "defaultLocation";
-        switch(result(distances)){
-            case "Athens": startActivity(new Intent(MainActivity.this,AthensActivity.class));
+        switch (result(distances)) {
+            case "Athens":
+                startActivity(new Intent(MainActivity.this, AthensActivity.class));
                 break;
-            case "Piraeus": startActivity(new Intent(MainActivity.this,PiraeusActivity.class));
+            case "Piraeus":
+                startActivity(new Intent(MainActivity.this, PiraeusActivity.class));
                 break;
-            case "Thessaloniki": startActivity(new Intent(MainActivity.this,ThessalonikiActivity.class));
+            case "Thessaloniki":
+                startActivity(new Intent(MainActivity.this, ThessalonikiActivity.class));
                 break;
-            case "Kriti": startActivity(new Intent(MainActivity.this,KritiActivity.class));
+            case "Kriti":
+                startActivity(new Intent(MainActivity.this, KritiActivity.class));
                 break;
-            default: startActivity(new Intent(this,MainActivity.class));
+            default:
+                startActivity(new Intent(this, MainActivity.class));
                 break;
         }
     }
@@ -105,16 +133,17 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     }
 
-    public static String result(float[][] distances){
+
+    public static String result(float[][] distances) {
         if (Double.valueOf(distances[0][0]) < radius) {
-           return "Athens";
+            return "Athens";
         } else if (Double.valueOf(distances[1][0]) < radius) {
             return "Piraeus";
         } else if (Double.valueOf(distances[2][0]) < radius) {
             return "Thessaloniki";
-        }else if (Double.valueOf(distances[3][0]) < radius) {
+        } else if (Double.valueOf(distances[3][0]) < radius) {
             return "Kriti";
-        }else {
+        } else {
             return "Nowhere";
         }
     }
