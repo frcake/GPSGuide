@@ -12,19 +12,19 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
+
 
 public class MainActivity extends AppCompatActivity implements LocationListener {
 
     private final int permissionCode = 100;
     LocationManager locationManager;
-    LocationListener locationListener;
     Button button;
     TextView textView, textView2;
-    private boolean clickFlag = false;
-    //sets the global radius on which the program decides what activity to show
-    public static final double radius = 1000;
-    String badPermissionToast = "For this application to work, GPS data permission is needed!";
+    private static boolean clickFlag = true;
+    String[] perm = new String[]{Manifest.permission.ACCESS_FINE_LOCATION};
+    int result[] = new int[]{};
+    //sets the global radius of proximity
+    public static final double radius = 100;
 
     static final double athensLong = 23.7275;
     static final double athensLat = 37.9838;
@@ -41,26 +41,30 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+
+        if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            askForPermission();
+            onRequestPermissionsResult(permissionCode,perm,result);
+        }else if(ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, MainActivity.this);
+        }
+
         button = (Button) findViewById(R.id.button);
         textView = (TextView) findViewById(R.id.textView5);
         textView2 = (TextView) findViewById(R.id.textView2);
-        //Toast toastBadPermission = Toast.makeText(getApplicationContext(), badPermissionToast, Toast.LENGTH_LONG);
-        //ask for permissions right after the application starts!+
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (!clickFlag) {
-                    askForPermission();
-                    //check if permission was given by the user
-                    locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
                     if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                        //Go to an activity that warns the user about
-                        //this applications functionality and needed
-                        //permissions in order to function correctly
-                    } else {
+                        askForPermission();
+                        onRequestPermissionsResult(permissionCode,perm,result);
+                    }else if(ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, MainActivity.this);
                     }
+
                     button.setText("Stop Guide");
                     clickFlag = true;
                 } else {
@@ -76,9 +80,34 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         });
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode,String permissions[], int[] grantResults) {
+        button = (Button) findViewById(R.id.button);
+        switch (requestCode) {
+            case 100: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    button.setText("Stop Guide");
+                    clickFlag = true;
+                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, MainActivity.this);
+                } else {
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                    button.setText("Start Guide");
+                    clickFlag = false;
+                }
+                return;
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
+    }
 
     public void askForPermission() {
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, permissionCode);
+        ActivityCompat.requestPermissions(MainActivity.this,perm, permissionCode);
 
     }
 
@@ -92,7 +121,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         float[] distance2 = new float[3];
         float[] distance3 = new float[3];
         float[] distance4 = new float[3];
-        Intent intent;
         Location.distanceBetween(currentLat, currentLong, athensLat, athensLong, distance1);
         Location.distanceBetween(currentLat, currentLong, peirLat, peirLong, distance2);
         Location.distanceBetween(currentLat, currentLong, thesLat, thesLong, distance3);

@@ -18,10 +18,31 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".AthensActivity" />
-        <activity android:name=".KritiActivity" />
-        <activity android:name=".ThessalonikiActivity" />
-        <activity android:name=".PiraeusActivity"></activity>
-    </application>
+
+        <activity android:name=".AthensActivity">
+           <!-- <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />-->
+        </activity>
+
+        <activity android:name=".KritiActivity">
+            <!-- <meta-data
+               android:name="android.support.PARENT_ACTIVITY"
+               android:value=".MainActivity" />-->
+       </activity>
+
+       <activity android:name=".ThessalonikiActivity">
+            <!-- <meta-data
+               android:name="android.support.PARENT_ACTIVITY"
+               android:value=".MainActivity" />-->
+       </activity>
+
+       <activity android:name=".PiraeusActivity">
+            <!-- <meta-data
+               android:name="android.support.PARENT_ACTIVITY"
+               android:value=".MainActivity" />-->
+       </activity>
+
+   </application>
 
 </manifest>
