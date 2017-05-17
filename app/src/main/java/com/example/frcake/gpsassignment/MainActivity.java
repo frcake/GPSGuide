@@ -192,7 +192,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     protected void onResume(){
         super.onResume();
-        getUpdates();
+        if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            askForPermission();
+            onRequestPermissionsResult(permissionCode,perm,result);
+        }else if(ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            getUpdates();
+        }
     }
 
 }
