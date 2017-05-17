@@ -10,7 +10,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-public class KritiActivity extends AppCompatActivity  {
+public class KritiActivity extends MainActivity  {
 
 
     @Override
@@ -20,5 +20,11 @@ public class KritiActivity extends AppCompatActivity  {
 
     }
 
+    protected void onResume(){
+        super.onResume();
+    }
 
+    protected void onPause(){
+        super.onPause();
+    }
 }

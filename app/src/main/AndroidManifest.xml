@@ -20,27 +20,27 @@
         </activity>
 
         <activity android:name=".AthensActivity">
-           <!-- <meta-data
+            <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />-->
+                android:value=".MainActivity" />
         </activity>
 
         <activity android:name=".KritiActivity">
-            <!-- <meta-data
+             <meta-data
                android:name="android.support.PARENT_ACTIVITY"
-               android:value=".MainActivity" />-->
+               android:value=".MainActivity" />
        </activity>
 
        <activity android:name=".ThessalonikiActivity">
-            <!-- <meta-data
+             <meta-data
                android:name="android.support.PARENT_ACTIVITY"
-               android:value=".MainActivity" />-->
+               android:value=".MainActivity" />
        </activity>
 
        <activity android:name=".PiraeusActivity">
-            <!-- <meta-data
+             <meta-data
                android:name="android.support.PARENT_ACTIVITY"
-               android:value=".MainActivity" />-->
+               android:value=".MainActivity" />
        </activity>
 
    </application>

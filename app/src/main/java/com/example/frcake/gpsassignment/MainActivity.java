@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             askForPermission();
             onRequestPermissionsResult(permissionCode,perm,result);
         }else if(ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, MainActivity.this);
+            getUpdates();
         }
 
         button = (Button) findViewById(R.id.button);
@@ -62,14 +62,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                         askForPermission();
                         onRequestPermissionsResult(permissionCode,perm,result);
                     }else if(ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, MainActivity.this);
+                        getUpdates();
                     }
 
                     button.setText("Stop Guide");
                     clickFlag = true;
                 } else {
                     try {
-                        locationManager.removeUpdates(MainActivity.this);
+                        stopGps();
                     } catch (Exception ex) {
 
                     }
@@ -78,6 +78,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 }
             }
         });
+    }
+
+    public void getUpdates() {
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, MainActivity.this);
+    }
+
+    public void stopGps() {
+        locationManager.removeUpdates(MainActivity.this);
     }
 
     @Override
@@ -90,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     button.setText("Stop Guide");
                     clickFlag = true;
-                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, MainActivity.this);
+                    getUpdates();
                 } else {
 
                     // permission denied, boo! Disable the
@@ -175,4 +183,16 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             return "Nowhere";
         }
     }
+
+
+    protected void onPause(){
+        super.onPause();
+        stopGps();
+    }
+
+    protected void onResume(){
+        super.onResume();
+        getUpdates();
+    }
+
 }
